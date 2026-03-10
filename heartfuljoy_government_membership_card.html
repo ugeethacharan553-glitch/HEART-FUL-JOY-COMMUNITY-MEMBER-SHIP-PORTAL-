@@ -1,0 +1,226 @@
+<!DOCTYPE html><html>
+<head>
+<title>Heartful Joy Community Membership Card</title><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script><style>
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+background:#f2f2f2;
+text-align:center;
+padding-top:20px;
+}
+
+/* INPUT */
+input{
+padding:10px;
+width:330px;
+font-size:16px;
+margin:10px;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+font-weight:bold;
+margin:10px;
+}
+
+/* FRONT + BACK WRAPPER */
+.pdf-card{
+width:680px;
+height:215px;
+display:flex;
+margin:20px auto;
+}
+
+/* CARD */
+.card{
+width:340px;
+height:215px;
+border-radius:10px;
+border:3px solid #000;
+position:relative;
+overflow:hidden;
+}
+
+/* FRONT COLOR */
+.card-front{
+background:linear-gradient(to bottom,#FFD9A0,#FFFFFF,#D4F5D4);
+padding-left:15px;
+}
+
+/* BACK COLOR */
+.card-back{
+background:linear-gradient(to bottom,#D4F5D4,#FFFFFF,#FFD9A0);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+}
+
+/* ASHOKA CHAKRA LOGO */
+.logo{
+position:absolute;
+top:8px;
+left:10px;
+width:42px;
+}
+
+/* GOVERNMENT STYLE TEXT */
+.card-front h3{
+font-size:20px;
+font-weight:900;
+color:#000;
+margin-top:10px;
+}
+
+.card-front h4{
+font-size:15px;
+font-weight:900;
+color:#000;
+}
+
+.card-front p{
+font-size:14px;
+font-weight:900;
+color:#000;
+margin:3px 0;
+text-align:left;
+}
+
+/* BACK MEMBERSHIP ID */
+#backID{
+font-size:46px;
+font-weight:900;
+color:#000;
+margin-bottom:10px;
+}
+
+/* LARGE QR CENTER */
+#qr-code-back{
+width:120px;
+height:120px;
+}
+
+/* FRONT QR */
+#qr-code-front{
+position:absolute;
+bottom:10px;
+right:10px;
+}
+
+/* LOTUS WATERMARK */
+.card-back::before{
+content:"";
+position:absolute;
+top:50%;
+left:50%;
+width:260px;
+height:160px;
+background:url('https://upload.wikimedia.org/wikipedia/commons/7/73/Lotus_flower_icon.svg') no-repeat center;
+background-size:contain;
+opacity:0.25;
+transform:translate(-50%,-50%);
+}
+
+</style></head><body><h2>Heartful Joy Community Membership Card</h2><input type="text" id="name" placeholder="Enter Member Name"><br><button onclick="generateCard()">Generate Card</button>
+<button id="downloadBtn" style="display:none" onclick="downloadPDF()">Download PDF</button>
+
+<div class="pdf-card" id="pdfCard" style="display:none"><!-- FRONT --><div class="card card-front" id="cardFront"><img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Ashoka_Chakra.svg"><h3>Heartful Joy Community</h3>
+<h4>Official Membership Identity</h4><hr><p>Name : <span id="memberName"></span></p>
+<p>Membership ID : <span id="memberID"></span></p>
+<p>Status : <span id="memberStatus"></span></p>
+<p>Date of Issue : <span id="issueDate"></span></p><canvas id="qr-code-front"></canvas>
+
+</div><!-- BACK --><div class="card card-back" id="cardBack"><span id="backID"></span>
+
+<canvas id="qr-code-back"></canvas>
+
+</div></div><script>
+
+/* MEMBER DATABASE */
+
+const members={
+
+"UBBARAPU VENKATA GEETHA CHARAN":{id:"HFJ-0001",status:"Permanent Member"},
+"PUTTANEEDI JAIDEEP VENKATA SAI":{id:"HFJ-0002",status:"Permanent Member"},
+"PUTTANEEDI HARSHITHA":{id:"HFJ-0003",status:"Permanent Member"},
+"VALISETTY JAYALAKSHMI":{id:"HFJ-0004",status:"Permanent Member"},
+"KOTTE CHARANYA":{id:"HFJ-0005",status:"Permanent Member"},
+"KOTTE DINESH VENKATA SAI":{id:"HFJ-0006",status:"Permanent Member"},
+"KOTTE SARITHA":{id:"HFJ-0007",status:"Permanent Member"},
+"PUTTANEEDI RUPA DEVI":{id:"HFJ-0008",status:"Permanent Member"},
+"MARUBOINA LOHITHA":{id:"HFJ-0009",status:"Permanent Member"},
+"MARUBOINA LEELAVATHI":{id:"HFJ-0010",status:"Permanent Member"},
+"BADANABOINA UMA DEVI":{id:"HFJ-0011",status:"Permanent Member"},
+"PUTTANEEDI KOTESWARAMMA":{id:"HFJ-0012",status:"Permanent Member"},
+"VALISETTY VIJAYADURGA":{id:"HFJ-0013",status:"Temporarily Approved"}
+
+};
+
+let currentID="";
+
+function generateCard(){
+
+let name=document.getElementById("name").value.trim().toUpperCase();
+
+if(members[name]){
+
+currentID=members[name].id;
+
+document.getElementById("memberName").innerText=name;
+document.getElementById("memberID").innerText=currentID;
+document.getElementById("memberStatus").innerText=members[name].status;
+document.getElementById("issueDate").innerText=new Date().toLocaleDateString();
+document.getElementById("backID").innerText=currentID;
+
+document.getElementById("pdfCard").style.display="flex";
+document.getElementById("downloadBtn").style.display="inline-block";
+
+/* QR codes */
+
+new QRious({
+element:document.getElementById("qr-code-front"),
+value:currentID,
+size:70
+});
+
+new QRious({
+element:document.getElementById("qr-code-back"),
+value:currentID,
+size:120
+});
+
+}
+
+else{
+alert("Member Not Found");
+}
+
+}
+
+/* DOWNLOAD PDF */
+
+function downloadPDF(){
+
+html2canvas(document.getElementById("pdfCard")).then(canvas=>{
+
+const imgData=canvas.toDataURL("image/png");
+
+const {jsPDF}=window.jspdf;
+
+const pdf=new jsPDF({
+orientation:"landscape",
+unit:"px",
+format:[680,215]
+});
+
+pdf.addImage(imgData,"PNG",0,0,680,215);
+
+pdf.save(currentID+"_membership_card.pdf");
+
+});
+
+}
+
+</script></body>
+</html>
